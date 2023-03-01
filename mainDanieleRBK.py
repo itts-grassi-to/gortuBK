@@ -1,10 +1,16 @@
 # ## CREATO DA ORTU prof. DANIELE
 # ## daniele.ortu@itisgrassi.edu.it
 
+import pre_conf
+
+pre = pre_conf.Pre()
+if not pre.configurato():
+    exit()
+else:
+    import segnali
 import gi
 import os
 import ast
-import segnali
 import socket
 
 gi.require_version("Gtk", "3.0")
@@ -15,23 +21,26 @@ from mainConfig import MainConfig, EventiConfig
 
 CURRDIR = os.path.dirname(os.path.abspath(__file__))
 GLADE = os.path.join(CURRDIR, 'danieleRBK.glade')
-PATH_CONF = os.path.join(CURRDIR, 'danieleRBK.conf')
+# PATH_CONF = os.path.join(CURRDIR, 'danieleRBK.conf')
 
-#STRUTTURA_CONFIGURAZIONE={
+# STRUTTURA_CONFIGURAZIONE={
 #            'bks': {},
 #            'altro': {'mailFROM': '', 'mailTO': ''}
-#}
-SPAZI="    "
+# }
+SPAZI = "    "
+
 
 class Eventi:
     def __init__(self):
         pass
+
     def on_click_nuovo(self, button):
         print("Click nuovo")
         gestione.on_nuovo_clicked()
-        #gestione.on_nuovo_clicked(lstBKS)
+        # gestione.on_nuovo_clicked(lstBKS)
+
     def on_click_modifica(self, button):
-        #gestione.on_modifica_clicked()
+        # gestione.on_modifica_clicked()
         lst = gestione.getLstBKS()
         if not lst.get_selected_row():
             dialog = Gtk.MessageDialog(
@@ -47,23 +56,27 @@ class Eventi:
         builder = Gtk.Builder()
         ch = lst.get_selected_row().get_child().get_children()[1].get_label()
         tit = lst.get_selected_row().get_child().get_children()[0].get_text()
-        #print(ch)
+        # print(ch)
         mc = MainConfig(PATH_CONF, ch, builder)
         builder.connect_signals(EventiConfig(mc))
         window = mc.getWin()
-        window.set_title("Modifico "+tit)
+        window.set_title("Modifico " + tit)
         window.set_modal(True)
         # window.set_icon_from_file(ICON)
         window.connect("destroy", Gtk.main_quit)
         window.show_all()
         Gtk.main()
+
     def on_click_cancella(self, button):
         gestione.on_cancella_clicked()
+
     def on_show_click_menu(self, button):
         print("clicked onshow")
         gestione.on_show_click()
+
     def lbl_click(self):
         print("clicked*************")
+
 
 class GMain:
     def __init__(self, builder):
@@ -75,21 +88,24 @@ class GMain:
         self.__pop = builder.get_object('popover')
         if not os.path.isfile(PATH_CONF):
             with open(PATH_CONF, "w") as f:
-                #print(str(STRUTTURA_CONFIGURAZIONE))
+                # print(str(STRUTTURA_CONFIGURAZIONE))
                 f.write(str(STRUTTURA_CONFIGURAZIONE))
         self.__configurazione = self.get_impostazioni(PATH_CONF)
         self.__bks = self.__configurazione['bks']
         self.lst_chiavi = []
         self.__attach_rows()
         self.__setLed()
+
     def getLstBKS(self):
         return self.__lstBKS
+
     def __setLed(self):
         print("setled")
         if self.invia(segnali.IS_ATTIVO) == segnali.OK:
             self.__lblLed.set_markup("<span background='green'><big>    </big></span>")
         else:
             self.__lblLed.set_markup("<span background='red'><big>    </big></span>")
+
     def invia(self, richi):
         try:
             with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
@@ -100,15 +116,18 @@ class GMain:
         except:
             return segnali.NOK
         # print(f"Received {data!r}")
+
     def get_impostazioni(self, f):
         with open(f, "r") as data:
             d = ast.literal_eval(data.read())
             data.close()
             return d
+
     def __attach_rows(self):
         # print("Backup: " + str(self.bks['bks']))
         for chiave in self.__bks:
             self.__lstBKS.add(self.__attach_row(chiave))
+
     def __attach_row(self, ch):
         row = Gtk.ListBoxRow()
         hbox = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=50)
@@ -127,14 +146,16 @@ class GMain:
         # hbox.pack_start(check, False, True, 0)
 
         return row
+
     def __on_toggled_ck(self, ck):
         ch = ck.get_label()
         self.__bks[ch]['attivo'] = ck.get_active()
         with open(PATH_CONF, "w") as data:
             data.write(str(self.__configurazione))
             data.close()
+
     def on_cancella_clicked(self):
-        #print("Hello, world")
+        # print("Hello, world")
         if not self.__lstBKS.get_selected_row():
             dialog = Gtk.MessageDialog(
                 transient_for=None,
@@ -150,12 +171,13 @@ class GMain:
         i = self.__lstBKS.get_selected_row().get_index()
         ch = self.__lstBKS.get_selected_row().get_child().get_children()[1].get_label()
         self.__lstBKS.remove(
-                self.__lstBKS.get_row_at_index(i)
+            self.__lstBKS.get_row_at_index(i)
         )
         del self.__configurazione['bks'][ch]
-        with open(PATH_CONF,'w') as f:
+        with open(PATH_CONF, 'w') as f:
             f.write(str(self.__configurazione))
             f.close()
+
     def on_nuovo_clicked(self):
         # print("NUOVO")
         nv = MainNuovo(CURRDIR, PATH_CONF)
@@ -164,8 +186,10 @@ class GMain:
         self.__bks = nv.cnf['bks']
         self.__lstBKS.add(self.__attach_row(nv.ch))
         self.__lstBKS.show_all()
+
     def on_show_click(self):
         self.__pop.popup()
+
     def getWin(self):
         return self.__builder.get_object('MainWin')
 
@@ -174,9 +198,9 @@ builder = Gtk.Builder()
 builder.add_from_file(GLADE)
 
 # window = builder.get_object('MainWin')
-#pop = builder.get_object('popover')
-#lstBKS = builder.get_object('lstBKS')
-#lblLed=builder.get_object('lblLed')
+# pop = builder.get_object('popover')
+# lstBKS = builder.get_object('lstBKS')
+# lblLed=builder.get_object('lblLed')
 # window.set_icon_from_file(ICON)
 
 gestione = GMain(builder)

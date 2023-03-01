@@ -1,7 +1,7 @@
 # ## CREATO DA ORTU prof. DANIELE
 # ## daniele.ortu@itisgrassi.edu.it
 
-from utility import Utility_bk
+# from utility import Utility_bk
 class Pg23:
     def __init__(self,   npg, builder, ch, bks):
         # print(bks)
