@@ -3,11 +3,12 @@
 
 import pre_conf
 
-pre = pre_conf.Pre()
-if not pre.configurato():
+c = pre_conf.GPre()
+c.run()
+if not c.continua:
     exit()
-else:
-    import segnali
+
+import segnali
 import gi
 import os
 import ast
@@ -21,7 +22,7 @@ from mainConfig import MainConfig, EventiConfig
 
 CURRDIR = os.path.dirname(os.path.abspath(__file__))
 GLADE = os.path.join(CURRDIR, 'danieleRBK.glade')
-# PATH_CONF = os.path.join(CURRDIR, 'danieleRBK.conf')
+PATH_CONF = os.path.join(c.dirLIB, 'ortuBK.conf')
 
 # STRUTTURA_CONFIGURAZIONE={
 #            'bks': {},
@@ -86,10 +87,14 @@ class GMain:
         self.__lstBKS = builder.get_object('lstBKS')
         self.__lblLed = builder.get_object('lblLed')
         self.__pop = builder.get_object('popover')
+
+        '''
         if not os.path.isfile(PATH_CONF):
             with open(PATH_CONF, "w") as f:
                 # print(str(STRUTTURA_CONFIGURAZIONE))
                 f.write(str(STRUTTURA_CONFIGURAZIONE))
+        '''
+
         self.__configurazione = self.get_impostazioni(PATH_CONF)
         self.__bks = self.__configurazione['bks']
         self.lst_chiavi = []

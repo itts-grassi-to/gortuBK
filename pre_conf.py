@@ -13,6 +13,7 @@ FC = os.path.join(CURRDIR, 'gortuBK.conf')
 class Eventi:
     def __init__(self, b):
         self.__build = b
+        self.continua = False
     def on_click_salva(self, button):
         print("on_click_salva")
         d = {
@@ -32,19 +33,25 @@ class Eventi:
         dialog.destroy()
     def on_click_continua(self, button):
         print("on_click_continua")
+        self.continua = True
+        self.__build.get_object('preWin').destroy()
     def on_click_esci(self, button):
         print("on_click_esci")
+        self.__build.get_object('preWin').destroy()
 
 
 class GPre:
     def __init__(self):
         self.__build = Gtk.Builder()
         self.__build.add_from_file(GLADE)
-        self.__build.connect_signals(Eventi(self.__build))
+        self.continua = False
+        self.dirLIB, self.IP_HOST = self.__caricaFC()
+        self.__ev = Eventi(self.__build)
+        self.__build.connect_signals(self.__ev)
 
-        self.__dirLIB, self.__IP_HOST = self.__caricaFC()
-        self.__build.get_object('dirChose').set_filename(self.__dirLIB)
-        self.__build.get_object('txt_ipHost').set_text(self.__IP_HOST)
+        self.__build.get_object('dirChose').set_filename(self.dirLIB)
+        self.__build.get_object('txt_ipHost').set_text(self.IP_HOST)
+
         #self.__dirChose.set_filename(self.__dirLIB)
 
         self.__obj_win = self.__build.get_object('preWin')
@@ -68,7 +75,7 @@ class GPre:
         self.__obj_win.connect("destroy", Gtk.main_quit)
         self.__obj_win.show_all()
         Gtk.main()
-        return self.__dirLIB, self.__IP_HOST
+        self.continua = self.__ev.continua
 
 #builder = Gtk.Builder()
 #builder.add_from_file(GLADE)
@@ -78,5 +85,6 @@ class GPre:
 # w.show_all()
 # Gtk.main()
 
-c = GPre()
-print(c.run())
+# c = GPre()
+# c.run()
+# print(c.continua, c.dirLIB, c.IP_HOST)
