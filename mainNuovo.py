@@ -4,6 +4,8 @@
 import os
 import gi
 import ast
+import socket
+import segnali
 #import utility
 
 gi.require_version("Gtk", "3.0")
@@ -21,18 +23,51 @@ class EventiNuovo:
         self.__mn.on_annulla()
 
 class MainNuovo:
-    def __init__(self, currdir, path_conf):
+    def __init__(self,host, currdir):
         # self.__builder = builder
+        self.ch = ""
         self.__builder=Gtk.Builder()
+        self.__host = host
         self.__builder.add_from_file( os.path.join(currdir, 'nuovo.glade'))
-        self.__path_conf = path_conf
+        '''
         with open(self.__path_conf, 'r') as f:
-            self.__configurazione = ast.literal_eval(f.read())
+            self.configurazione = ast.literal_eval(f.read())
             f.close()
-
+        '''
+        self.configurazione = self.__get_impostazioni()
         self.__txtChiave = self.__builder.get_object('txtChiave')
         self.__txtTitolo = self.__builder.get_object('txtTitolo')
 
+    def __get_impostazioni(self):
+        ''''
+        with open(f, "r") as data:
+            d = ast.literal_eval(data.read())
+            data.close()
+            return d
+        '''
+        with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+            s.connect((self.__host, segnali.PORT))
+            s.sendall(segnali.GET_CONF)
+
+            rec = b""
+            while True:
+                d = s.recv(segnali.DIM_BUFFER)
+                if not d:
+                    break
+                rec += d
+            return ast.literal_eval(rec.decode('utf-8'))
+    def __send_impostazioni(self, conf):
+        with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+            s.connect((self.__host, segnali.PORT))
+            s.sendall(segnali.SEND_CONF)
+            d = s.recv(segnali.DIM_BUFFER)
+            #print(conf)
+            #print(len(str(conf)))
+            if d == segnali.OK:
+                s.sendall(bytes(str(conf), 'utf-8'))
+                s.shutdown(socket.SHUT_WR)
+            else:
+                print("Errore invio dati")
     def __pulisci(self, s):
         s = s.replace("à", "a")
         s = s.replace("è", "e")
@@ -49,24 +84,26 @@ class MainNuovo:
         return s
     def __esisteCodice(self, s):
         # print("esisteCodice")
-        return s in self.__configurazione['bks']
+        return s in self.configurazione['bks']
     def __salvaNuovo(self, ch, titolo):
         # print("salvaNuovo")
         # self.bks['bks'] = ch
         self.ch = ch
-        self.cnf = self.__configurazione
-        self.__configurazione['bks'][ch] = {
+
+        self.configurazione['bks'][ch] = {
                 'attivo': True ,'titolo': titolo,
                 'dirDA': {'remoto': False, 'loc_path': '', 'protocollo': '', 'host': '', 'utente': '', 'rem_path': '', 'mnt': ch+"DA"},
                 'dirTO': {'remoto': False, 'loc_path': '', 'protocollo': '', 'host': '', 'utente': '', 'rem_path': '', 'mnt': ch+"TO"},
-                'cron': {'minuto': '', 'ora': '', 'giorno': '', 'mese': '', 'settimana': []}
+                'cron': {'minuto': '1', 'ora': '1', 'giorno': '1', 'mese': '1', 'settimana': []}
             }
-        os.system("mkdir -p " + self.__configurazione['bks'][ch]['dirDA']['mnt'])
-        os.system("mkdir -p " + self.__configurazione['bks'][ch]['dirTO']['mnt'])
+        # os.system("mkdir -p " + self.configurazione['bks'][ch]['dirDA']['mnt'])
+        # os.system("mkdir -p " + self.configurazione['bks'][ch]['dirTO']['mnt'])
+        '''
         with open(self.__path_conf, "w") as data:
-            data.write(str(self.__configurazione))
+            data.write(str(self.configurazione))
             data.close()
-
+        '''
+        self.__send_impostazioni(self.configurazione)
     def __msg(self, s, tipo):
         dialog = Gtk.MessageDialog(
             transient_for=None,
@@ -102,7 +139,9 @@ class MainNuovo:
         self.__w.connect("destroy", Gtk.main_quit)
         self.__w.show_all()
         Gtk.main()
+        # self.ch = ""
     def on_annulla(self):
+        # self.ch = ""
         self.__w.destroy()
 
 #*********** da commentare

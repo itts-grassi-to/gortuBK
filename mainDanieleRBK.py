@@ -8,6 +8,7 @@ c.run()
 if not c.continua:
     exit()
 
+HOST = c.IP_HOST
 import segnali
 import gi
 import os
@@ -22,7 +23,7 @@ from mainConfig import MainConfig, EventiConfig
 
 CURRDIR = os.path.dirname(os.path.abspath(__file__))
 GLADE = os.path.join(CURRDIR, 'danieleRBK.glade')
-PATH_CONF = os.path.join(c.dirLIB, 'ortuBK.conf')
+# PATH_CONF = os.path.join(c.dirLIB, 'ortuBK.conf')
 
 # STRUTTURA_CONFIGURAZIONE={
 #            'bks': {},
@@ -32,8 +33,8 @@ SPAZI = "    "
 
 
 class Eventi:
-    def __init__(self):
-        pass
+    def __init__(self, conf):
+        self.__configurazione = conf
 
     def on_click_nuovo(self, button):
         print("Click nuovo")
@@ -58,8 +59,8 @@ class Eventi:
         ch = lst.get_selected_row().get_child().get_children()[1].get_label()
         tit = lst.get_selected_row().get_child().get_children()[0].get_text()
         # print(ch)
-        mc = MainConfig(PATH_CONF, ch, builder)
-        builder.connect_signals(EventiConfig(mc))
+        mc = MainConfig(self.__configurazione, ch, builder)
+        builder.connect_signals(EventiConfig(HOST, mc))
         window = mc.getWin()
         window.set_title("Modifico " + tit)
         window.set_modal(True)
@@ -83,7 +84,6 @@ class GMain:
     def __init__(self, builder):
         # self.path_fconf = PATH_CONF
         self.__builder = builder
-
         self.__lstBKS = builder.get_object('lstBKS')
         self.__lblLed = builder.get_object('lblLed')
         self.__pop = builder.get_object('popover')
@@ -95,8 +95,12 @@ class GMain:
                 f.write(str(STRUTTURA_CONFIGURAZIONE))
         '''
 
-        self.__configurazione = self.get_impostazioni(PATH_CONF)
+        # self.__configurazione = self.get_impostazioni(PATH_CONF)
+        self.__configurazione = self.get_impostazioni()
+        self.__builder.connect_signals(Eventi(self.__configurazione))
+        # print(self.__configurazione)
         self.__bks = self.__configurazione['bks']
+
         self.lst_chiavi = []
         self.__attach_rows()
         self.__setLed()
@@ -114,20 +118,42 @@ class GMain:
     def invia(self, richi):
         try:
             with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-                s.connect((segnali.HOST, segnali.PORT))
+                s.connect((HOST, segnali.PORT))
                 s.sendall(richi)
-                data = s.recv(1024)
+                data = s.recv(segnali.DIM_BUFFER)
                 return data
         except:
             return segnali.NOK
         # print(f"Received {data!r}")
-
-    def get_impostazioni(self, f):
+    def __send_impostazioni(self, conf):
+        with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+            s.connect((HOST, segnali.PORT))
+            s.sendall(segnali.SEND_CONF)
+            d = s.recv(segnali.DIM_BUFFER)
+            #print(conf)
+            #print(len(str(conf)))
+            if d == segnali.OK:
+                s.sendall(bytes(str(conf), 'utf-8'))
+                s.shutdown(socket.SHUT_WR)
+            else:
+                print("Errore invio dati")
+    def get_impostazioni(self):
+        ''''
         with open(f, "r") as data:
             d = ast.literal_eval(data.read())
             data.close()
             return d
-
+        '''
+        with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+            s.connect((HOST, segnali.PORT))
+            s.sendall(segnali.GET_CONF)
+            rec =b""
+            while True:
+                d = s.recv(segnali.DIM_BUFFER)
+                if not d:
+                    break
+                rec += d
+            return ast.literal_eval(rec.decode('utf-8'))
     def __attach_rows(self):
         # print("Backup: " + str(self.bks['bks']))
         for chiave in self.__bks:
@@ -155,10 +181,12 @@ class GMain:
     def __on_toggled_ck(self, ck):
         ch = ck.get_label()
         self.__bks[ch]['attivo'] = ck.get_active()
+        '''
         with open(PATH_CONF, "w") as data:
             data.write(str(self.__configurazione))
             data.close()
-
+        '''
+        self.__send_impostazioni(self.__configurazione)
     def on_cancella_clicked(self):
         # print("Hello, world")
         if not self.__lstBKS.get_selected_row():
@@ -185,11 +213,12 @@ class GMain:
 
     def on_nuovo_clicked(self):
         # print("NUOVO")
-        nv = MainNuovo(CURRDIR, PATH_CONF)
+        nv = MainNuovo(HOST, CURRDIR)
         nv.run()
-        self.__configurazione = nv.cnf
-        self.__bks = nv.cnf['bks']
-        self.__lstBKS.add(self.__attach_row(nv.ch))
+        self.__configurazione = nv.configurazione
+        self.__bks = nv.configurazione['bks']
+        if nv.ch != "":
+            self.__lstBKS.add(self.__attach_row(nv.ch))
         self.__lstBKS.show_all()
 
     def on_show_click(self):
@@ -209,7 +238,7 @@ builder.add_from_file(GLADE)
 # window.set_icon_from_file(ICON)
 
 gestione = GMain(builder)
-builder.connect_signals(Eventi())
+# builder.connect_signals(Eventi())
 window = gestione.getWin()
 window.connect("destroy", Gtk.main_quit)
 window.show_all()

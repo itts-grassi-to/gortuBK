@@ -11,6 +11,7 @@ from gi.repository import Gtk
 
 from pg1 import Pg1
 from pg2_3 import Pg23
+import segnali
 
 
 CURRDIR = os.path.dirname(os.path.abspath(__file__))
@@ -19,16 +20,33 @@ GLADE = os.path.join(CURRDIR, 'config.glade')
 
 class EventiConfig:
 
-    def __init__( self, obj):
+    def __init__( self, host, obj):
+        self.__host = host
         self.__mc = obj
+    def __send_impostazioni(self, conf):
+        with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+            s.connect((self.__host, segnali.PORT))
+            s.sendall(segnali.SEND_CONF)
+            d = s.recv(segnali.DIM_BUFFER)
+            #print(conf)
+            #print(len(str(conf)))
+            if d == segnali.OK:
+                s.sendall(bytes(str(conf), 'utf-8'))
+                s.shutdown(socket.SHUT_WR)
+            else:
+                print("Errore invio dati")
+
     def on_click_salva(self, button):
         self.__mc.salvaPG1()
         self.__mc.pg2.on_salva()
         self.__mc.pg3.on_salva()
         # print(self.__mc._bks)
+        '''
         with open(self.__mc.path_conf,'w') as f:
             f.write(str(self.__mc._bks))
             f.close()
+        '''
+        self.__send_impostazioni(self.__mc._bks)
         dialog = Gtk.MessageDialog(
             transient_for=None,
             flags=0,
@@ -44,7 +62,7 @@ class EventiConfig:
             with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
                 s.connect((segnali.HOST, segnali.PORT))
                 s.sendall(richi)
-                data = s.recv(1024)
+                data = s.recv(segnali.DIM_BUFFER)
                 return data
         except:
             return segnali.NOK
@@ -89,13 +107,15 @@ class EventiConfig:
         pass
 
 class MainConfig(Pg1):
-    def __init__(self, path_conf, ch, builder):
-        self.path_conf = path_conf
+    def __init__(self, conf, ch, builder):
+        # self.path_conf = path_conf
         self.__builder = builder
-
+        '''
         with open(self.path_conf, "r") as f:
             self.__bks = ast.literal_eval(f.read())
             f.close()
+        '''
+        self.__bks = conf
         self.__builder.add_from_file(GLADE)
         Pg1.__init__(self, builder, ch, self.__bks)
         self.pg2 = Pg23(2, builder, ch, self.__bks)

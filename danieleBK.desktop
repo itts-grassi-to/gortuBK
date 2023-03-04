@@ -1,0 +1,6 @@
+[Desktop Entry]
+Version=1.00 
+Name=danieleBK
+Type=Application
+Exec=python3 /home/neo/Scrivania/repository-git/ortuBK/gortuBK/mainDanieleRBK.py
+Icon=/home/neo/Scrivania/repository-git/ortuBK/gortuBK/danieleBK.png
