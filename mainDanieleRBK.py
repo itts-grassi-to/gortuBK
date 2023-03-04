@@ -207,10 +207,12 @@ class GMain:
             self.__lstBKS.get_row_at_index(i)
         )
         del self.__configurazione['bks'][ch]
+        '''
         with open(PATH_CONF, 'w') as f:
             f.write(str(self.__configurazione))
             f.close()
-
+        '''
+        self.__send_impostazioni( self.__configurazione)
     def on_nuovo_clicked(self):
         # print("NUOVO")
         nv = MainNuovo(HOST, CURRDIR)
