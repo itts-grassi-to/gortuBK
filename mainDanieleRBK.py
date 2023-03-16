@@ -145,15 +145,18 @@ class GMain:
             return d
         '''
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-            s.connect((HOST, segnali.PORT))
-            s.sendall(segnali.GET_CONF)
-            rec =b""
-            while True:
-                d = s.recv(segnali.DIM_BUFFER)
-                if not d:
-                    break
-                rec += d
-            return ast.literal_eval(rec.decode('utf-8'))
+            try:
+                s.connect((HOST, segnali.PORT))
+                s.sendall(segnali.GET_CONF)
+                rec =b""
+                while True:
+                    d = s.recv(segnali.DIM_BUFFER)
+                    if not d:
+                        break
+                    rec += d
+                return ast.literal_eval(rec.decode('utf-8'))
+            except:
+                return {}
     def __attach_rows(self):
         # print("Backup: " + str(self.bks['bks']))
         for chiave in self.__bks:

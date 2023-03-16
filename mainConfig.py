@@ -36,6 +36,9 @@ class EventiConfig:
             else:
                 print("Errore invio dati")
 
+    def on_change_protoDA(self, button):
+        # print("Ho cambiato il protocollo")
+        self.__mc.pg2.on_proto_changed()
     def on_click_salva(self, button):
         self.__mc.salvaPG1()
         self.__mc.pg2.on_salva()

@@ -18,6 +18,7 @@ class Pg23:
             self.__cmbProtocollo = builder.get_object('cmbOrigineProtocollo')
             self.__txtUtente = builder.get_object('txtOrigineUtente')
             self.__txtHost = builder.get_object('txtOrigineHost')
+            self.__txtPass = builder.get_object('txtOriginePassword')
             self.__txtRemPath = builder.get_object('txtOrigineRemPath')
             self.__who = 'dirDA'
         else:
@@ -29,6 +30,7 @@ class Pg23:
             self.__cmbProtocollo = builder.get_object('cmbDestinazioneProtocollo')
             self.__txtUtente = builder.get_object('txtDestinazioneUtente')
             self.__txtHost = builder.get_object('txtDestinazioneHost')
+            self.__txtPass = builder.get_object('txtDestinazionePassword')
             self.__txtRemPath = builder.get_object('txtDestinazioneRemPath')
             self.__who = 'dirTO'
 
@@ -55,6 +57,12 @@ class Pg23:
                 self.__cmbProtocollo.set_active(i)
                 # print(i)
             i = i + 1
+    def __esisteChiave(self,ch):
+        try:
+            tmp = self.__bk[self.__who]['passwd']
+            return True
+        except:
+            return False
     def __caricaCampi(self):
         self.__txtLocPath.set_editable(False)
         self.__txtLocPath.set_text(self.__bk[self.__who]['loc_path'])
@@ -63,12 +71,14 @@ class Pg23:
         self.__getCombo()
         self.__txtHost.set_text(self.__bk[self.__who]['host'])
         self.__txtUtente.set_text(self.__bk[self.__who]['utente'])
+        self.__txtPass.set_text(self.__bk[self.__who]['passwd'])
         self.__txtRemPath.set_text(self.__bk[self.__who]['rem_path'])
         if self.__bk[self.__who]['remoto']:
             self.__rdRem.set_active(True)
         else:
             self.__rdLoc.set_active(True)
-
+    def on_proto_changed(self):
+        print("PAG2_3: on_proto_changed")
     def on_rd_click(self):
         if self.__rdLoc.get_active():
             self.__btLocPath.set_sensitive(True)
@@ -83,7 +93,8 @@ class Pg23:
             self.__txtHost.set_editable(True)
             self.__txtUtente.set_editable(True)
             self.__txtRemPath.set_editable(True)
-
+    def on_proto_changed(self):
+        print("PAG1_2: proto changed")
     def on_mount(self, currdir):
         u = Utility_bk(currdir)
         r = u.mount(
@@ -106,4 +117,5 @@ class Pg23:
         self.__bk[self.__who]['protocollo'] = self.__cmbProtocollo.get_active_text()
         self.__bk[self.__who]['host'] = self.__txtHost.get_text()
         self.__bk[self.__who]['utente'] = self.__txtUtente.get_text()
+        self.__bk[self.__who]['passwd'] = self.__txtPass.get_text()
         self.__bk[self.__who]['rem_path'] = self.__txtRemPath.get_text()

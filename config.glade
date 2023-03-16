@@ -568,6 +568,7 @@
                                 <property name="visible">True</property>
                                 <property name="can-focus">False</property>
                                 <property name="halign">start</property>
+                                <signal name="changed" handler="on_change_protoDA" swapped="no"/>
                               </object>
                               <packing>
                                 <property name="expand">False</property>
@@ -645,6 +646,18 @@
                                 <property name="expand">False</property>
                                 <property name="fill">True</property>
                                 <property name="position">1</property>
+                              </packing>
+                            </child>
+                            <child>
+                              <object class="GtkEntry" id="txtOriginePassword">
+                                <property name="can-focus">True</property>
+                                <property name="visibility">False</property>
+                                <property name="invisible-char">•</property>
+                              </object>
+                              <packing>
+                                <property name="expand">False</property>
+                                <property name="fill">True</property>
+                                <property name="position">2</property>
                               </packing>
                             </child>
                           </object>
@@ -934,6 +947,19 @@
                                 <property name="expand">False</property>
                                 <property name="fill">True</property>
                                 <property name="position">1</property>
+                              </packing>
+                            </child>
+                            <child>
+                              <object class="GtkEntry" id="txtDestinazionePassword">
+                                <property name="visible">True</property>
+                                <property name="can-focus">True</property>
+                                <property name="visibility">False</property>
+                                <property name="invisible-char">•</property>
+                              </object>
+                              <packing>
+                                <property name="expand">False</property>
+                                <property name="fill">True</property>
+                                <property name="position">2</property>
                               </packing>
                             </child>
                           </object>
