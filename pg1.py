@@ -29,7 +29,7 @@ class Pg1:
         self.__ckSab = builder.get_object('ckSab')
         self.__ckSab.set_active(6 in self.__bk['cron']['settimana'])
         self.__ckDom = builder.get_object('ckDom')
-        self.__ckDom.set_active(7 in self.__bk['cron']['settimana'])
+        self.__ckDom.set_active(0 in self.__bk['cron']['settimana'])
         # email
         self.__txtMailFROM = builder.get_object('txtMailFROM')
         self.__txtMailFROM.set_text(self.__altro['mailFROM'])
