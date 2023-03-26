@@ -96,7 +96,19 @@ class GMain:
         '''
 
         # self.__configurazione = self.get_impostazioni(PATH_CONF)
-        self.__configurazione = self.get_impostazioni()
+        self.__configurazione, err = self.get_impostazioni()
+        if err != "":
+            dialog = Gtk.MessageDialog(
+                transient_for=None,
+                flags=0,
+                message_type=Gtk.MessageType.INFO,
+                buttons=Gtk.ButtonsType.CLOSE,
+                text=err
+            )
+            dialog.run()
+            dialog.destroy()
+            exit(0)
+
         self.__builder.connect_signals(Eventi(self.__configurazione))
         # print(self.__configurazione)
         self.__bks = self.__configurazione['bks']
@@ -154,9 +166,9 @@ class GMain:
                     if not d:
                         break
                     rec += d
-                return ast.literal_eval(rec.decode('utf-8'))
-            except:
-                return {}
+                return ast.literal_eval(rec.decode('utf-8')), ""
+            except socket.error as err:
+                return {}, err
     def __attach_rows(self):
         # print("Backup: " + str(self.bks['bks']))
         for chiave in self.__bks:
