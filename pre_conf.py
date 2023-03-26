@@ -14,6 +14,7 @@ class Eventi:
     def __init__(self, b):
         self.__build = b
         self.continua = False
+        self.iphost = ""
     def on_click_salva(self, button):
         print("on_click_salva")
         d = {
@@ -34,6 +35,7 @@ class Eventi:
     def on_click_continua(self, button):
         print("on_click_continua")
         self.continua = True
+        self.iphost = self.__build.get_object('txt_ipHost').get_text()
         self.__build.get_object('preWin').destroy()
     def on_click_esci(self, button):
         print("on_click_esci")
@@ -76,6 +78,7 @@ class GPre:
         self.__obj_win.show_all()
         Gtk.main()
         self.continua = self.__ev.continua
+        self.IP_HOST = self.__ev.iphost
 
 #builder = Gtk.Builder()
 #builder.add_from_file(GLADE)
