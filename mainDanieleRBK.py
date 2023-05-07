@@ -23,7 +23,7 @@ from mainConfig import MainConfig, EventiConfig
 
 CURRDIR = os.path.dirname(os.path.abspath(__file__))
 GLADE = os.path.join(CURRDIR, 'danieleRBK.glade')
-# ICON = os.path.join(CURRDIR, 'img/danieleBK.png')
+ICON = os.path.join(CURRDIR, 'img/danieleBK.png')
 # PATH_CONF = os.path.join(c.dirLIB, 'ortuBK.conf')
 
 # STRUTTURA_CONFIGURAZIONE={
@@ -258,7 +258,7 @@ gestione = GMain(builder)
 # builder.connect_signals(Eventi())
 window = gestione.getWin()
 window.connect("destroy", Gtk.main_quit)
-# window.set_icon_from_file(ICON)
+window.set_icon_from_file(ICON)
 window.show_all()
 
 Gtk.main()
