@@ -8,6 +8,7 @@ from gi.repository import Gtk
 CURRDIR = os.path.dirname(os.path.abspath(__file__))
 GLADE = os.path.join(CURRDIR, 'pre.glade')
 FC = os.path.join(CURRDIR, 'gortuBK.conf')
+ICON = os.path.join(CURRDIR, 'img/danieleBK.png')
 
 
 class Eventi:
@@ -73,6 +74,7 @@ class GPre:
     def run(self):
         #w = self.__obj_win.getWin()
         self.__obj_win.connect("destroy", Gtk.main_quit)
+        self.__obj_win.set_icon_from_file(ICON)
         self.__obj_win.show_all()
         Gtk.main()
         self.continua = self.__ev.continua
