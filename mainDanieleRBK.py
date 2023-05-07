@@ -104,7 +104,7 @@ class GMain:
                 flags=0,
                 message_type=Gtk.MessageType.INFO,
                 buttons=Gtk.ButtonsType.CLOSE,
-                text=str(HOST) + ": " + str(err)
+                text=err
             )
             dialog.run()
             dialog.destroy()
@@ -159,7 +159,6 @@ class GMain:
         '''
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
             try:
-                s.settimeout(5)
                 s.connect((HOST, segnali.PORT))
                 s.sendall(segnali.GET_CONF)
                 rec =b""
@@ -171,9 +170,6 @@ class GMain:
                 return ast.literal_eval(rec.decode('utf-8')), ""
             except socket.error as err:
                 return {}, err
-            except:
-                return {}, "Errore generico di connessione"
-
     def __attach_rows(self):
         # print("Backup: " + str(self.bks['bks']))
         for chiave in self.__bks:
