@@ -74,8 +74,21 @@ class Eventi:
         gestione.on_cancella_clicked()
 
     def on_show_click_menu(self, button):
-        print("clicked onshow")
-        gestione.on_show_click()
+        #print("clicked onshow")
+        #gestione.on_show_click()
+        dialog = Gtk.MessageDialog(
+            transient_for=None,
+            flags=0,
+            message_type=Gtk.MessageType.INFO,
+            buttons=Gtk.ButtonsType.CLOSE,
+            text =  "********************** Creato  da Ortu prof. Daniele *****************\n\n"+ \
+                    "  email: daniele.ortu@itisgrassi.edu.it     \n"+ \
+                    "  Software per backup incrementali\n\n"+ \
+                    "**************************************************************************"
+        )
+        dialog.run()
+        dialog.destroy()
+
 
     def lbl_click(self):
         print("clicked*************")
