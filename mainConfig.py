@@ -59,7 +59,7 @@ class EventiConfig:
         )
         dialog.run()
         dialog.destroy()
-        self.__invia(segnali.RESTART)
+        #self.__invia(segnali.RESTART)
     def __invia(self, richi):
         try:
             with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
