@@ -35,7 +35,6 @@ class EventiConfig:
                 s.shutdown(socket.SHUT_WR)
             else:
                 print("Errore invio dati")
-
     def on_change_protoDA(self, button):
         # print("Ho cambiato il protocollo")
         self.__mc.pg2.on_proto_changed()
@@ -70,7 +69,6 @@ class EventiConfig:
         except:
             return segnali.NOK
         # print(f"Received {data!r}")
-
     def on_click_monta(self, button):
         print("click monta")
         r = self.__mc.pg2.on_mount(CURRDIR)
@@ -92,7 +90,6 @@ class EventiConfig:
             )
         dialog.run()
         dialog.destroy()
-
     def on_click_rd_origine_loc(self, rd):
        # print("click origine")
         self.__mc.pg2.on_rd_click()
@@ -105,9 +102,12 @@ class EventiConfig:
     def on__dst_loc_currdir_changed(self,widget):
         #print(self.__mc.pg3.getBtLocPathText())
         self.__mc.pg3.setTxtLocPath(self.__mc.pg3.getBtLocPathText())
-
     def on_click_annulla(self, button):
-        pass
+        print("Annulla")
+        #self.__mc.on_annulla()
+        Gtk.main_quit()
+        #self.__builder.get_object('MainWinConfig').destroy()
+
 
 class MainConfig(Pg1):
     def __init__(self, conf, ch, builder):
@@ -124,6 +124,9 @@ class MainConfig(Pg1):
         self.pg2 = Pg23(2, builder, ch, self.__bks)
         self.pg3 = Pg23(3, builder, ch, self.__bks)
 
+    def on_annulla(self):
+        pass
+        #self.destroy()
     def getWin(self):
         return self.__builder.get_object('MainWinConfig')
 

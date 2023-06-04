@@ -69,6 +69,7 @@ class Eventi:
         window.connect("destroy", Gtk.main_quit)
         window.show_all()
         Gtk.main()
+        window.hide()
 
     def on_click_cancella(self, button):
         gestione.on_cancella_clicked()
@@ -167,7 +168,7 @@ class GMain:
         ''''
         with open(f, "r") as data:
             d = ast.literal_eval(data.read())
-            data.close()
+            data.close() self.__mc.
             return d
         '''
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
