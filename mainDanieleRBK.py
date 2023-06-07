@@ -38,12 +38,12 @@ class Eventi:
         self.__configurazione = conf
 
     def on_click_nuovo(self, button):
-        print("Click nuovo")
+        #print("Click nuovo")
         gestione.on_nuovo_clicked()
         # gestione.on_nuovo_clicked(lstBKS)
-
     def on_click_modifica(self, button):
-        # gestione.on_modifica_clicked()
+        gestione.on_modifica_clicked()
+        '''
         lst = gestione.getLstBKS()
         if not lst.get_selected_row():
             dialog = Gtk.MessageDialog(
@@ -56,6 +56,7 @@ class Eventi:
             dialog.run()
             dialog.destroy()
             return
+
         builder = Gtk.Builder()
         ch = lst.get_selected_row().get_child().get_children()[1].get_label()
         tit = lst.get_selected_row().get_child().get_children()[0].get_text()
@@ -70,10 +71,9 @@ class Eventi:
         window.show_all()
         Gtk.main()
         window.hide()
-
+        '''
     def on_click_cancella(self, button):
         gestione.on_cancella_clicked()
-
     def on_show_click_menu(self, button):
         #print("clicked onshow")
         #gestione.on_show_click()
@@ -89,12 +89,8 @@ class Eventi:
         )
         dialog.run()
         dialog.destroy()
-
-
     def lbl_click(self):
         print("clicked*************")
-
-
 class GMain:
     def __init__(self, builder):
         # self.path_fconf = PATH_CONF
@@ -131,17 +127,14 @@ class GMain:
         self.lst_chiavi = []
         self.__attach_rows()
         self.__setLed()
-
     def getLstBKS(self):
         return self.__lstBKS
-
     def __setLed(self):
         print("setled")
         if self.invia(segnali.IS_ATTIVO) == segnali.OK:
             self.__lblLed.set_markup("<span background='green'><big>    </big></span>")
         else:
             self.__lblLed.set_markup("<span background='red'><big>    </big></span>")
-
     def invia(self, richi):
         try:
             with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
@@ -188,7 +181,6 @@ class GMain:
         # print("Backup: " + str(self.bks['bks']))
         for chiave in self.__bks:
             self.__lstBKS.add(self.__attach_row(chiave))
-
     def __attach_row(self, ch):
         row = Gtk.ListBoxRow()
         hbox = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=50)
@@ -207,7 +199,6 @@ class GMain:
         # hbox.pack_start(check, False, True, 0)
 
         return row
-
     def __on_toggled_ck(self, ck):
         ch = ck.get_label()
         self.__bks[ch]['attivo'] = ck.get_active()
@@ -217,6 +208,34 @@ class GMain:
             data.close()
         '''
         self.__send_impostazioni(self.__configurazione)
+    def on_modifica_clicked(self):
+        lst = gestione.getLstBKS()
+        if not lst.get_selected_row():
+            dialog = Gtk.MessageDialog(
+                transient_for=None,
+                flags=0,
+                message_type=Gtk.MessageType.ERROR,
+                buttons=Gtk.ButtonsType.CLOSE,
+                text="Seleziona il backup da modificare",
+            )
+            dialog.run()
+            dialog.destroy()
+            return
+
+        builder = Gtk.Builder()
+        ch = lst.get_selected_row().get_child().get_children()[1].get_label()
+        tit = lst.get_selected_row().get_child().get_children()[0].get_text()
+        # print(ch)
+        mc = MainConfig(self.__configurazione, ch, builder)
+        builder.connect_signals(EventiConfig(HOST, mc))
+        window = mc.getWin()
+        window.set_title("Modifico " + tit)
+        window.set_modal(True)
+        # window.set_icon_from_file(ICON)
+        window.connect("destroy", Gtk.main_quit)
+        window.show_all()
+        Gtk.main()
+        window.hide()
     def on_cancella_clicked(self):
         # print("Hello, world")
         if not self.__lstBKS.get_selected_row():
@@ -237,6 +256,7 @@ class GMain:
             self.__lstBKS.get_row_at_index(i)
         )
         del self.__configurazione['bks'][ch]
+        self.__send_impostazioni(self.__configurazione)
         '''
         with open(PATH_CONF, 'w') as f:
             f.write(str(self.__configurazione))
@@ -247,15 +267,28 @@ class GMain:
         # print("NUOVO")
         nv = MainNuovo(HOST, CURRDIR)
         nv.run()
-        self.__configurazione = nv.configurazione
-        self.__bks = nv.configurazione['bks']
+        #self.__configurazione = nv.configurazione
+        #self.__bks = nv.configurazione['bks']
+        self.__configurazione, err = self.get_impostazioni()
+        if err != "":
+            dialog = Gtk.MessageDialog(
+                transient_for=None,
+                flags=0,
+                message_type=Gtk.MessageType.INFO,
+                buttons=Gtk.ButtonsType.CLOSE,
+                text=err
+            )
+            dialog.run()
+            dialog.destroy()
+            exit(0)
+
+        self.__bks = self.__configurazione['bks']
         if nv.ch != "":
             self.__lstBKS.add(self.__attach_row(nv.ch))
         self.__lstBKS.show_all()
 
     def on_show_click(self):
         self.__pop.popup()
-
     def getWin(self):
         return self.__builder.get_object('MainWin')
 

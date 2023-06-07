@@ -4,43 +4,45 @@
 class Pg1:
     def __init__(self,  builder, ch, bks):
         # print(bks)
+
+        self._bks = bks
+        self.__bk = bks['bks'][ch]
+        self.__altro = bks['altro']
+        self.__txtOra = builder.get_object('txtOra')
+        self.__txtMin = builder.get_object('txtMin')
+        self.__txtGio = builder.get_object('txtGio')
+        self.__txtMese = builder.get_object('txtMese')
+        self.__ckLun = builder.get_object('ckLun')
+        self.__ckMar = builder.get_object('ckMar')
+        self.__ckMer = builder.get_object('ckMer')
+        self.__ckGio = builder.get_object('ckGio')
+        self.__ckVen = builder.get_object('ckVen')
+        self.__ckSab = builder.get_object('ckSab')
+        self.__ckDom = builder.get_object('ckDom')
+        self.__txtNumeroBK = builder.get_object('txtNumeroBK')
+        self.__txtMailFROM = builder.get_object('txtMailFROM')
+        self.__txtMailTO = builder.get_object('txtMailTO')
         try:
-            self._bks = bks
-            self.__bk = bks['bks'][ch]
-            self.__altro = bks['altro']
-            self.__txtOra = builder.get_object('txtOra')
             self.__txtOra.set_text(self.__bk['cron']['ora'])
-            self.__txtMin = builder.get_object('txtMin')
             self.__txtMin.set_text(self.__bk['cron']['minuto'])
-            self.__txtGio = builder.get_object('txtGio')
             self.__txtGio.set_text(self.__bk['cron']['giorno'])
-            self.__txtMese = builder.get_object('txtMese')
             self.__txtMese.set_text(self.__bk['cron']['mese'])
             # Giorno settimana
-            self.__ckLun = builder.get_object('ckLun')
             self.__ckLun.set_active(1 in self.__bk['cron']['settimana'])
-            self.__ckMar = builder.get_object('ckMar')
             self.__ckMar.set_active(2 in self.__bk['cron']['settimana'])
-            self.__ckMer = builder.get_object('ckMer')
             self.__ckMer.set_active(3 in self.__bk['cron']['settimana'])
-            self.__ckGio = builder.get_object('ckGio')
             self.__ckGio.set_active(4 in self.__bk['cron']['settimana'])
-            self.__ckVen = builder.get_object('ckVen')
             self.__ckVen.set_active(5 in self.__bk['cron']['settimana'])
-            self.__ckSab = builder.get_object('ckSab')
             self.__ckSab.set_active(6 in self.__bk['cron']['settimana'])
-            self.__ckDom = builder.get_object('ckDom')
             self.__ckDom.set_active(0 in self.__bk['cron']['settimana'])
             #numero backup
-            self.__txtNumeroBK = builder.get_object('txtNumeroBK')
             self.__txtNumeroBK.set_text(self.__bk['numeroBK'])
             # email
-            self.__txtMailFROM = builder.get_object('txtMailFROM')
             self.__txtMailFROM.set_text(self.__altro['mailFROM'])
-            self.__txtMailTO = builder.get_object('txtMailTO')
             self.__txtMailTO.set_text(self.__altro['mailTO'])
-        except:
-            print("warring: caricamento oggetto configurazione")
+        except KeyError as er:
+            print(f"warring: chiave di configurazione {er} inesistente")
+
 
     def __is_active(self, giorno):
         if self.__bk['cron']['settimana'] == '*':

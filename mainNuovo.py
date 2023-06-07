@@ -94,7 +94,8 @@ class MainNuovo:
                 'attivo': True ,'titolo': titolo,
                 'dirDA': {'remoto': False, 'loc_path': '', 'protocollo': '', 'host': '', 'utente': '', 'rem_path': '', 'passwd':'', 'mnt': ch+"DA"},
                 'dirTO': {'remoto': False, 'loc_path': '', 'protocollo': '', 'host': '', 'utente': '', 'rem_path': '', 'passwd':'', 'mnt': ch+"TO"},
-                'cron': {'minuto': '1', 'ora': '1', 'giorno': '1', 'mese': '1', 'settimana': []}
+                'cron': {'minuto': '1', 'ora': '1', 'giorno': '1', 'mese': '1', 'settimana': []},
+                'numeroBK':'0'
             }
         # os.system("mkdir -p " + self.configurazione['bks'][ch]['dirDA']['mnt'])
         # os.system("mkdir -p " + self.configurazione['bks'][ch]['dirTO']['mnt'])
